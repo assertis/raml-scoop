@@ -1,6 +1,6 @@
 {
   "name": "assertis/raml-scoop",
-  "license": "MIT",
+  "license": "GNU GPLv3",
   "type": "project",
   "authors": [
     {
@@ -8,12 +8,26 @@
       "email": "michal@assertis.co.uk"
     }
   ],
+  "autoload": {
+    "psr-4": {
+      "Assertis\\RamlScoop\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Assertis\\RamlScoop\\": "tests/"
+    }
+  },
+  "bin": [
+    "bin/raml-scoop"
+  ],
   "require": {
     "php": ">=7.1",
     "alecsammon/php-raml-parser": "^2.2",
     "symfony/console": "^3.3"
   },
   "require-dev": {
+    "pds/skeleton": "^1.0",
     "roave/security-advisories": "dev-master",
     "symfony/var-dumper": "^3.3",
     "phpunit/phpunit": "^6.1"

@@ -1,0 +1,10 @@
+{
+  "output": "/full/or-relative/path",
+  "sources": [
+    {
+      "name": "My Spec",
+      "prefix": "/api/my",
+      "path": "../relative-to/raml-scoop-dir/specification.raml"
+    }
+  ]
+}

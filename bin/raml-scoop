@@ -1,0 +1,16 @@
+#!/usr/bin/env php
+<?php
+declare(strict_types=1);
+
+// Inspired by https://github.com/php-pds/skeleton
+
+if (file_exists($autoloadFile = __DIR__ . '/../vendor/autoload.php')) {
+    require $autoloadFile;
+} elseif (file_exists($autoloadFile = __DIR__ . '/../../../autoload.php')) {
+    require $autoloadFile;
+} else {
+    echo "Autoload file not found; try 'composer dump-autoload' first." . PHP_EOL;
+    exit(1);
+}
+
+(new Symfony\Component\Console\Application())->run();
