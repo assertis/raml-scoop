@@ -24,7 +24,10 @@
   "require": {
     "php": ">=7.1",
     "alecsammon/php-raml-parser": "^2.2",
-    "symfony/console": "^3.3"
+    "symfony/console": "^3.3",
+    "league/flysystem": "^1.0",
+    "symfony/config": "^3.3",
+    "league/container": "^2.4"
   },
   "require-dev": {
     "pds/skeleton": "^1.0",

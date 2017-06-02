@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 // Inspired by https://github.com/php-pds/skeleton
 
+use Assertis\RamlScoop\Command\GenerateCommand;
+use Assertis\RamlScoop\Configuration\ConfigurationResolver;
+use Symfony\Component\Console\Application;
+
 if (file_exists($autoloadFile = __DIR__ . '/../vendor/autoload.php')) {
     require $autoloadFile;
 } elseif (file_exists($autoloadFile = __DIR__ . '/../../../autoload.php')) {
@@ -13,4 +17,21 @@ if (file_exists($autoloadFile = __DIR__ . '/../vendor/autoload.php')) {
     exit(1);
 }
 
-(new Symfony\Component\Console\Application())->run();
+$container = new League\Container\Container;
+
+$container->add(Application::class, function () use ($container) {
+    $app = new Application();
+    $app->add($container->get(GenerateCommand::class));
+
+    return $app;
+});
+
+$container->add(ConfigurationResolver::class, function () {
+    return new ConfigurationResolver(realpath(__DIR__ . '/../config'));
+});
+
+$container->add(GenerateCommand::class, function () use ($container) {
+    return new GenerateCommand($container->get(ConfigurationResolver::class));
+});
+
+exit($container->get(Application::class)->run());
