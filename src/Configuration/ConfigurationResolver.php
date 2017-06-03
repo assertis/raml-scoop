@@ -20,13 +20,19 @@ class ConfigurationResolver
      * @var string
      */
     private $configDir;
+    /**
+     * @var string
+     */
+    private $currentPath;
 
     /**
      * @param string $configDir
+     * @param string $currentPath
      */
-    public function __construct(string $configDir)
+    public function __construct(string $configDir, string $currentPath)
     {
         $this->configDir = $configDir;
+        $this->currentPath = $currentPath;
     }
 
     /**
@@ -58,7 +64,7 @@ class ConfigurationResolver
      */
     public function getPath(string $name): string
     {
-        return $this->getLocator()->locate($name, null, false);
+        return $this->getLocator()->locate($name, $this->currentPath, true);
     }
     
     /**

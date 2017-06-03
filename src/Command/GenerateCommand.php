@@ -4,6 +4,9 @@ declare(strict_types=1);
 namespace Assertis\RamlScoop\Command;
 
 use Assertis\RamlScoop\Configuration\ConfigurationResolver;
+use Assertis\RamlScoop\Converters\HTML\HtmlConverter;
+use Assertis\RamlScoop\Schema\ProjectReader;
+use League\Flysystem\Adapter\Local;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -19,18 +22,27 @@ class GenerateCommand extends Command
      * @var ConfigurationResolver
      */
     private $configurationResolver;
+    /**
+     * @var ProjectReader
+     */
+    private $projectReader;
 
     /**
      * @param ConfigurationResolver $configurationResolver
+     * @param ProjectReader $projectReader
+     * @internal param SchemaReader $schemaReader
      */
-    public function __construct(ConfigurationResolver $configurationResolver)
-    {
+    public function __construct(
+        ConfigurationResolver $configurationResolver,
+        ProjectReader $projectReader
+    ) {
         parent::__construct();
 
         $this->configurationResolver = $configurationResolver;
+        $this->projectReader = $projectReader;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('generate')
@@ -58,7 +70,7 @@ class GenerateCommand extends Command
      * @param OutputInterface $output
      * @return int
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
@@ -68,12 +80,27 @@ class GenerateCommand extends Command
         $io->note('Using config: ' . $configPath);
 
         $config = $this->configurationResolver->resolve($configName);
-        
-        $io->text('Generating documentation...');
-        $io->text('Generated documentation');
+
+        $project = $this->projectReader->read($config);
+
+        $io->text(sprintf('Generating documentation for project "%s"...', $project->getName()));
+
+        foreach ($project->getFormats() as $format) {
+            switch ($format) {
+                case 'html':
+                    $converter = new HtmlConverter();
+                    $converter->convert($project, $project->getOutput(), 'html');
+                    break;
+            }
+        }
 
         $io->text('Flushing documentation to disk...');
-        $io->text('Flushed documentation to: '.$config['output']);
+
+        $adapter = $project->getOutput()->getAdapter();
+
+        if ($adapter instanceof Local) {
+            $io->text('Flushed documentation to: ' . $adapter->getPathPrefix());
+        }
 
         $io->success('Done');
 

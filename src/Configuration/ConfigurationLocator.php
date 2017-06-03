@@ -3,55 +3,48 @@ declare(strict_types=1);
 
 namespace Assertis\RamlScoop\Configuration;
 
-use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
-use Symfony\Component\Config\FileLocatorInterface;
+use Assertis\RamlScoop\Tools\FlexibleFileLocator;
 
 /**
  * @author Michał Tatarynowicz <michal.tatarynowicz@assertis.co.uk>
  */
-class ConfigurationLocator implements FileLocatorInterface
+class ConfigurationLocator extends FlexibleFileLocator
 {
     /**
      * @var string
      */
-    private $path;
+    private $defaultPath;
     /**
      * @var array
      */
     private $extensions;
 
     /**
-     * @param string $path
+     * @param string $defaultPath
      * @param array $extensions
      */
-    public function __construct(string $path, array $extensions)
+    public function __construct(string $defaultPath, array $extensions)
     {
-        $this->path = $path;
+        parent::__construct();
+        
+        if ($defaultPath[-1] !== '/') {
+            $defaultPath .= '/';
+        }
+
+        $this->defaultPath = $defaultPath;
         $this->extensions = $extensions;
     }
 
     /**
      * @inheritdoc
      */
-    public function locate($name, $currentPath = null, $first = true)
+    protected function getFullPath(string $name, ?string $currentPath): ?string
     {
-        $full = null;
-
         if (strpos($name, '.') === false) {
-            $full = $this->fromShortName($name);
-        } elseif ($name[0] === '/') {
-            // Full path
-            $full = realpath($name);
+            return $this->fromShortName($name);
         } else {
-            $full = $this->fromPartialPath($name, $currentPath);
+            return parent::getFullPath($name, $currentPath);
         }
-
-        if (empty($full) || !file_exists($full)) {
-            $message = sprintf('The file "%s" does not exist.', $name);
-            throw new FileLocatorFileNotFoundException($message, 0, null, [$name]);
-        }
-
-        return $full;
     }
 
     /**
@@ -61,36 +54,10 @@ class ConfigurationLocator implements FileLocatorInterface
     private function fromShortName(string $name): ?string
     {
         foreach ($this->extensions as $ext) {
-            $path = $this->path;
-            if ($path[-1] !== '/') {
-                $path .= '/';
-            }
-            $test = $path . $name . '.' . $ext;
+            $test = $this->defaultPath . $name . '.' . $ext;
 
             if (file_exists($test)) {
                 return realpath($test);
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * @param string $partial
-     * @param $currentPath
-     * @return null|string
-     */
-    private function fromPartialPath(string $partial, $currentPath): ?string
-    {
-        $paths = array_filter([$currentPath, $this->path]);
-
-        foreach ($paths as $path) {
-            if ($path[-1] !== '/') {
-                $path .= '/';
-            }
-
-            if (file_exists($path . $partial)) {
-                return realpath($path . $partial);
             }
         }
 

@@ -6,6 +6,10 @@ declare(strict_types=1);
 
 use Assertis\RamlScoop\Command\GenerateCommand;
 use Assertis\RamlScoop\Configuration\ConfigurationResolver;
+use Assertis\RamlScoop\Schema\ProjectReader;
+use Assertis\RamlScoop\Schema\SchemaReader;
+use Assertis\RamlScoop\Tools\FlexibleFileLocator;
+use Pimple\Container;
 use Symfony\Component\Console\Application;
 
 if (file_exists($autoloadFile = __DIR__ . '/../vendor/autoload.php')) {
@@ -17,21 +21,45 @@ if (file_exists($autoloadFile = __DIR__ . '/../vendor/autoload.php')) {
     exit(1);
 }
 
-$container = new League\Container\Container;
+$di = new Pimple\Container();
 
-$container->add(Application::class, function () use ($container) {
+$di['app.commands'] = [
+    GenerateCommand::class    
+];
+
+$di['dir.current'] = getcwd();
+$di['dir.root'] = realpath(dirname(__DIR__));
+$di['dir.config'] = $di['dir.root'] . '/config';
+
+$di[Application::class] = function (Container $di) {
     $app = new Application();
-    $app->add($container->get(GenerateCommand::class));
+    
+    foreach ($di['app.commands'] as $class) {
+        $app->add($di[$class]);
+    }
 
     return $app;
-});
+};
 
-$container->add(ConfigurationResolver::class, function () {
-    return new ConfigurationResolver(realpath(__DIR__ . '/../config'));
-});
+$di[ConfigurationResolver::class] = function (Container $di) {
+    return new ConfigurationResolver($di['dir.config'], $di['dir.current']);
+};
 
-$container->add(GenerateCommand::class, function () use ($container) {
-    return new GenerateCommand($container->get(ConfigurationResolver::class));
-});
+$di[SchemaReader::class] = function (Container $di) {
+    $locator = new FlexibleFileLocator([$di['dir.current']]);
 
-exit($container->get(Application::class)->run());
+    return new SchemaReader($locator);
+};
+
+$di[ProjectReader::class] = function (Container $di) {
+    return new ProjectReader($di[SchemaReader::class]);
+};
+
+$di[GenerateCommand::class] = function (Container $di) {
+    return new GenerateCommand(
+        $di[ConfigurationResolver::class],
+        $di[ProjectReader::class]
+    );
+};
+
+exit($di[Application::class]->run());

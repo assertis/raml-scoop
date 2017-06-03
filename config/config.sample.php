@@ -2,6 +2,10 @@
 declare(strict_types=1);
 
 return [
+    // Used as a label
+    // Can also be used as a basis for a filename (i.e. ProjectAPIv1.pdf)
+    'name' => 'Test Project',
+    
     // Where to put the generated documentation.
     // Default: 'resources/output'
     'output'  => '/full/or-relative/path',

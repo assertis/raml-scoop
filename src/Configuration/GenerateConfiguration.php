@@ -20,7 +20,10 @@ class GenerateConfiguration implements ConfigurationInterface
         $rootNode = $treeBuilder->root('config');
 
         $rootNode->children()
-            ->scalarNode('output')->end()
+            ->scalarNode('name')->isRequired()->end()
+            ->scalarNode('output')
+                ->defaultValue('resources/output')
+            ->end()
             ->arrayNode('formats')
                 ->prototype('scalar')->end()
                 ->defaultValue(['html','pdf'])
@@ -28,11 +31,11 @@ class GenerateConfiguration implements ConfigurationInterface
             ->arrayNode('sources')
                 ->prototype('array')
                     ->children()
-                        ->scalarNode('name')->end()
+                        ->scalarNode('name')->isRequired()->end()
                         ->scalarNode('prefix')
                             ->defaultValue('')
                         ->end()
-                        ->scalarNode('path')->end()
+                        ->scalarNode('path')->isRequired()->end()
                     ->end()
                 ->end()
             ->end();
