@@ -1,0 +1,41 @@
+<div class="parameter">
+    <p>
+        <span class="parameter-type">{{ parameter.type }}</span>
+        <span class="parameter-key">{{ parameter.key }}</span>
+        {% if parameter.displayName and parameter.displayName != parameter.key %}
+            <span class="parameter-name">{{ parameter.displayName }}</span>
+        {% endif %}
+        {% if parameter.required %}
+            <span class="parameter-required">(required)</span>
+        {% endif %}
+    </p>
+
+    {% if parameter.displayName %}
+        <p class="parameter-description">{{ parameter.description | markdown }}</p>
+    {% endif %}
+
+    {% if parameter.validationPattern %}
+        <p class="parameter-pattern">
+            <span class="parameter-pattern-label">Pattern:</span> 
+            <span class="parameter-pattern-value">{{ parameter.validationPattern }}</span>
+        </p>
+    {% endif %}
+
+    {% if parameter.examples %}
+        <p class="parameter-examples">
+            <span class="parameter-example-label">Example:</span>
+            <span class="parameter-example-value">{{ parameter.examples | join(' &middot; ') }}</span>
+        </p>
+    {% endif %}
+
+    {% if parameter.minLength or parameter.maxLength %}
+        <p class="parameter-length">
+            <span class="parameter-length-label">Length:</span>
+            <span class="parameter-length-value">
+                {{ parameter.minLength ? parameter.minLength : 0 }}&hellip;{{ (parameter.maxLength ? parameter.maxLength : '&infin;') | raw }}
+            </span>
+        </p>
+    {% endif %}
+
+</div>
+

@@ -36,6 +36,10 @@ class GenerateConfiguration implements ConfigurationInterface
                             ->defaultValue('')
                         ->end()
                         ->scalarNode('path')->isRequired()->end()
+                        ->arrayNode('exclude')
+                            ->prototype('scalar')->end()
+                            ->defaultValue([])
+                        ->end()
                     ->end()
                 ->end()
             ->end();

@@ -1,0 +1,15 @@
+{
+  "status": "success",
+  "data": {
+    "user": "/user/123",
+    "items": [
+      {
+        "product": "/product/234",
+        "price": 1250,
+        "quantity": 2
+      }
+    ],
+    "promoCode": null,
+    "created": "2017-06-06T12:34:56Z"
+  }
+}

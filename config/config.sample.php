@@ -27,7 +27,12 @@ return [
             // Paths can be relative to raml-scoop directory or absolute.
             // You can also use PHP to figure out a path.
             // Required.
-            'path'   => '../relative-to/raml-scoop-dir/specification.raml'
+            'path'   => '../relative-to/raml-scoop-dir/specification.raml',
+            
+            'exclude' => [
+                '/legacy-endpoint',
+                '/internal'
+            ]
         ]
     ]
 ];

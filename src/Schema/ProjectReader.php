@@ -35,7 +35,7 @@ class ProjectReader
         $sources = [];
         foreach ($config['sources'] as $source) {
             $definition = $this->schemaReader->read($source['path']);
-            $sources[] = new Source($source['name'], $source['prefix'], $definition);
+            $sources[] = new Source($source['name'], $source['prefix'], $definition, $source['exclude']);
         }
         
         return new Project($config['name'], $config['formats'], $output, $sources);

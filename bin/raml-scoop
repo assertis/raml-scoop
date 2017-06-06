@@ -2,15 +2,12 @@
 <?php
 declare(strict_types=1);
 
+error_reporting(E_ALL);
+ini_set('DISPLAY_ERRORS', '1');
+
 // Inspired by https://github.com/php-pds/skeleton
 
-use Assertis\RamlScoop\Command\GenerateCommand;
-use Assertis\RamlScoop\Configuration\ConfigurationResolver;
-use Assertis\RamlScoop\Schema\ProjectReader;
-use Assertis\RamlScoop\Schema\SchemaReader;
-use Assertis\RamlScoop\Tools\FlexibleFileLocator;
-use Pimple\Container;
-use Symfony\Component\Console\Application;
+use Assertis\RamlScoop\RamlScoop;
 
 if (file_exists($autoloadFile = __DIR__ . '/../vendor/autoload.php')) {
     require $autoloadFile;
@@ -21,45 +18,4 @@ if (file_exists($autoloadFile = __DIR__ . '/../vendor/autoload.php')) {
     exit(1);
 }
 
-$di = new Pimple\Container();
-
-$di['app.commands'] = [
-    GenerateCommand::class    
-];
-
-$di['dir.current'] = getcwd();
-$di['dir.root'] = realpath(dirname(__DIR__));
-$di['dir.config'] = $di['dir.root'] . '/config';
-
-$di[Application::class] = function (Container $di) {
-    $app = new Application();
-    
-    foreach ($di['app.commands'] as $class) {
-        $app->add($di[$class]);
-    }
-
-    return $app;
-};
-
-$di[ConfigurationResolver::class] = function (Container $di) {
-    return new ConfigurationResolver($di['dir.config'], $di['dir.current']);
-};
-
-$di[SchemaReader::class] = function (Container $di) {
-    $locator = new FlexibleFileLocator([$di['dir.current']]);
-
-    return new SchemaReader($locator);
-};
-
-$di[ProjectReader::class] = function (Container $di) {
-    return new ProjectReader($di[SchemaReader::class]);
-};
-
-$di[GenerateCommand::class] = function (Container $di) {
-    return new GenerateCommand(
-        $di[ConfigurationResolver::class],
-        $di[ProjectReader::class]
-    );
-};
-
-exit($di[Application::class]->run());
+exit(RamlScoop::getInstance(realpath(dirname(__DIR__)))->runCLI());

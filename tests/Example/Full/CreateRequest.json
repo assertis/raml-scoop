@@ -1,0 +1,11 @@
+{
+  "user": "/user/123",
+  "items": [
+    {
+      "product": "/product/234",
+      "price": 1250,
+      "quantity": 2
+    }
+  ],
+  "promoCode": null
+}

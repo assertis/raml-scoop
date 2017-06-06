@@ -28,7 +28,10 @@
     "symfony/config": "^3.3",
     "alecsammon/php-raml-parser": "^2.2",
     "league/flysystem": "^1.0",
-    "league/flysystem-memory": "^1.0"
+    "league/flysystem-memory": "^1.0",
+    "michelf/php-markdown": "^1.7",
+    "twig/twig": "^2.4",
+    "jralph/twig-markdown": "^2.0"
   },
   "require-dev": {
     "pds/skeleton": "^1.0",

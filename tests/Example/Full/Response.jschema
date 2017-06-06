@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "description": "A standard JSON response",
+  "type": "object",
+  "required": [
+    "status"
+  ],
+  "properties": {
+    "status": {
+      "description": "Response status",
+      "enum": [
+        "success",
+        "fail",
+        "error"
+      ]
+    },
+    "data": {
+      "description": "Response data",
+      "type": [
+        "object",
+        "array"
+      ]
+    },
+    "code": {
+      "description": "Response error code",
+      "type": "string"
+    },
+    "message": {
+      "description": "Response error message",
+      "type": "string"
+    }
+  }
+}

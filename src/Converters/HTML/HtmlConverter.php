@@ -7,9 +7,10 @@ use Assertis\RamlScoop\Converters\Converter;
 use Assertis\RamlScoop\Schema\Project;
 use Assertis\RamlScoop\Schema\Source;
 use League\Flysystem\Filesystem;
-use Raml\Body;
-use Raml\Method;
-use Raml\Response;
+use League\Flysystem\Memory\MemoryAdapter;
+use League\Flysystem\MountManager;
+use Twig_Environment as Twig;
+use Twig_Function;
 
 /**
  * @author Michał Tatarynowicz <michal.tatarynowicz@assertis.co.uk>
@@ -17,9 +18,32 @@ use Raml\Response;
 class HtmlConverter implements Converter
 {
     /**
+     * @var Filesystem
+     */
+    private $resources;
+    /**
+     * @var Twig
+     */
+    private $twig;
+
+    /**
+     * @param Filesystem $resources
+     * @param Twig $twig
+     */
+    public function __construct(Filesystem $resources, Twig $twig)
+    {
+        $this->resources = $resources;
+        $this->twig = $twig;
+
+        $this->twig->addFunction(new Twig_Function('schema', [$this, 'getSchemaHtml'], ['is_safe' => ['html']]));
+        $this->twig->addFunction(new Twig_Function('example', [$this, 'getExampleHtml'], ['is_safe' => ['html']]));
+        $this->twig->addFunction(new Twig_Function('dump', 'dump', ['is_safe' => ['html']]));
+    }
+
+    /**
      * @inheritdoc
      */
-    public function convert(Project $project, Filesystem $filesystem, string $filesystemPrefix): void
+    public function convert(Project $project): Filesystem
     {
         $out = '';
 
@@ -27,57 +51,34 @@ class HtmlConverter implements Converter
 
         /** @var Source $source */
         foreach ($project->getSources() as $source) {
-
+            
             $out .= "<h2 class='source-header'>{$source->getName()}</h2>\n";
+
+            if ($source->getDefinition()->getDocumentationList()) {
+                $out .= $this->twig->render(
+                    'Documentation.twig',
+                    ['items' => $source->getDefinition()->getDocumentationList()]
+                );
+            }
 
             /** @var \Raml\Resource $resource */
             foreach ($source->getDefinition()->getResources() as $resource) {
 
-                $out .= "
-                <h3 class='resource-header'>{$resource->getDisplayName()}</h3>
-                <p class='resource-description'>{$resource->getDescription()}</p>
-                ";
-
-                /** @var Method $method */
-                foreach ($resource->getMethods() as $method) {
-                    $out .= "
-<h4 class='method-header'>
-    <span class='method-type'>{$method->getType()}</span> 
-    <span class='method-uri-prefix'>{$source->getPrefix()}</span><span class='method-uri'>{$resource->getUri()}</span>
-</h4>\n
-                    ";
-
-                    /** @var Body $requestBody */
-                    foreach ($method->getBodies() as $requestBody) {
-                        $out .= $this->getJsonSchema('Request schema', (string)$requestBody->getSchema());
-
-                        foreach ($requestBody->getExamples() as $example) {
-                            $out .= "<h5 class='method-request-example-header'>Example request</h5>";
-                            $out .= $this->getJsonCodeExample($example);
-                        }
-                    }
-
-                    /** @var Response $response */
-                    foreach ($method->getResponses() as $response) {
-                        /** @var Body $responseBody */
-                        foreach ($response->getBodies() as $responseBody) {
-                            $out .= "
-<h5 class='method-response-header'>
-    <span class='method-response-code'>{$response->getStatusCode()}</span>
-    <span class='method-response-type'>{$responseBody->getMediaType()}</span>
-</h5>\n";
-
-                            $out .= $this->getJsonSchema('Response schema', (string)$responseBody->getSchema());
-
-                            if ($responseBody->getExamples()) {
-                                foreach ($responseBody->getExamples() as $example) {
-                                    $out .= "<h5 class='method-request-example-header'>Example response</h5>";
-                                    $out .= $this->getJsonCodeExample($example);
-                                }
-                            }
-                        }
-                    }
+                if (in_array($resource->getUri(), $source->getExcluded())) {
+                    continue;
                 }
+                
+                //$resource->getBaseUriParameters()
+
+                $out .= $this->twig->render(
+                    'Resource.twig',
+                    [
+                        'source'   => $source,
+                        'resource' => $resource,
+                    ]
+                );
+                
+                //foreach ($resource->getResources())
             }
         }
 
@@ -92,7 +93,7 @@ class HtmlConverter implements Converter
 <script src='highlight.js'></script>
 <script>hljs.initHighlightingOnLoad();</script>
 <script>
-var toggles = document.getElementsByClassName('schema-toggle');
+var toggles = document.getElementsByClassName('snippet-toggle');
 var ii;
 for (ii = 0; ii < toggles.length; ii++) {
     toggles[ii].onclick = function(){
@@ -110,14 +111,35 @@ for (ii = 0; ii < toggles.length; ii++) {
 </html>
 ";
 
-        $filesystem->put($filesystemPrefix . '/index.html', $out);
+        $filesystem = new Filesystem(new MemoryAdapter());
+        $filesystem->put('/index.html', $out);
+
+        $manager = new MountManager([
+            'res' => $this->resources,
+            'out' => $filesystem
+        ]);
+
+        $contents = $manager->listContents('res://', true);
+        foreach ($contents as $fileNode) {
+            if ($fileNode['type'] == 'dir') {
+                $manager->createDir('out://' . $fileNode['path']);
+                continue;
+            }
+
+            $manager->put(
+                'out://' . $fileNode['path'],
+                $manager->read('res://' . $fileNode['path'])
+            );
+        }
+
+        return $filesystem;
     }
 
     /**
      * @param string $json
      * @return string
      */
-    private function getJsonCodeExample(string $json): string
+    private function getJsonCodeSample(string $json): string
     {
         $json = json_encode(json_decode($json, true), JSON_PRETTY_PRINT);
 
@@ -126,17 +148,30 @@ for (ii = 0; ii < toggles.length; ii++) {
 
     /**
      * @param string $header
+     * @param string $json
+     * @return string
+     */
+    public function getExampleHtml(string $header, string $json): string
+    {
+        return
+            '<h5 class="example-header">' . $header . ' (<span class="snippet-toggle">show</span>)</h5>' .
+            '<div class="hide">' . $this->getJsonCodeSample($json) . "</div>";
+    }
+
+    /**
+     * @param string $header
      * @param string $schema
      * @return string
      */
-    private function getJsonSchema(string $header, string $schema): string
+    public function getSchemaHtml(string $header, string $schema): string
     {
         $data = json_decode($schema, true);
         $stripped = $this->removeSchemaIds($data);
+        $json = json_encode($stripped);
 
         return
-            '<h5 class="method-request-schema-header">' . $header . ' (<span class="schema-toggle">show</span>)</h5>' .
-            '<div class="hide">' . $this->getJsonCodeExample(json_encode($stripped)) . "</div>";
+            '<h5 class="schema-header">' . $header . ' (<span class="snippet-toggle">show</span>)</h5>' .
+            '<div class="hide">' . $this->getJsonCodeSample($json) . "</div>";
     }
 
     /**

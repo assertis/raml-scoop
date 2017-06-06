@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "type": "object",
+  "required": ["user", "items"],
+  "properties": {
+    "user": {
+      "$ref": "Types.jschema#/definitions/URI"
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "$ref": "CreateRequestItem.jschema"
+      }
+    },
+    "promoCode": {
+      "$ref": "Types.jschema#/definitions/PromoCode"
+    }
+  },
+  "additionalProperties": false
+}

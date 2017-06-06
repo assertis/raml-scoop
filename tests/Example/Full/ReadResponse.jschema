@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "allOf": [
+    {
+      "$ref": "ResponseWithData.jschema"
+    },
+    {
+      "properties": {
+        "data": {
+          "required": ["user", "items", "created"],
+          "properties": {
+            "user": {
+              "$ref": "Types.jschema#/definitions/URI"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "$ref": "CreateRequestItem.jschema"
+              }
+            },
+            "promoCode": {
+              "$ref": "Types.jschema#/definitions/PromoCode"
+            },
+            "created": {
+              "$ref": "Types.jschema#/definitions/DateTime"
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    }
+  ]
+}

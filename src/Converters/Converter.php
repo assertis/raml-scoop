@@ -13,9 +13,7 @@ interface Converter
 {
     /**
      * @param Project $project
-     * @param Filesystem $filesystem
-     * @param string $filesystemPrefix
-     * @return void
+     * @return Filesystem
      */
-    public function convert(Project $project, Filesystem $filesystem, string $filesystemPrefix): void;
+    public function convert(Project $project): Filesystem;
 }
