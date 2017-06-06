@@ -19,3 +19,8 @@ To start a live preview server: from the same config:
 ``` 
 
 Then navigate to [http://localhost:9999/](http://localhost:9999/).
+
+For comprehensive information about available options run:
+```
+./bin/raml-scoop
+``` 

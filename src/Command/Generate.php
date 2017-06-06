@@ -54,7 +54,7 @@ class Generate extends Command
         $this
             ->setName('generate')
             ->setDescription('Generates the documentation according to a config file')
-            ->setHelp('This command allows you to create a user...');
+            ->setHelp('This command allows you to generate a set of documentations for a selected config file.');
 
         $this->addOption(
             'config',
@@ -62,13 +62,6 @@ class Generate extends Command
             InputOption::VALUE_REQUIRED,
             'Name of or path to the config file (default: config/default.[php|json])',
             'default'
-        );
-
-        $this->addOption(
-            'dry-run',
-            'd',
-            InputOption::VALUE_NONE,
-            'Generate the documentation in-memory, without saving to disk'
         );
     }
 
