@@ -2,6 +2,14 @@ BODY {
     font-family: sans-serif;
 }
 
+UL {
+    padding: 0;
+}
+
+LI {
+    padding: 0;
+}
+
 .hide {
     display: none;
 }

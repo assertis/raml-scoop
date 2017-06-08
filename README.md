@@ -4,13 +4,15 @@ Converts a set of RAML/JSON-Schema specifications into a single set of API docum
 
 ## Usage
 
-Create a configuration file based on `./config/config.sample.php`, for example `./config/big.php`.
+Create a configuration file based on `./config/config.sample.php`.
 
-To generate a set of documentation from `./config/big.php` (or `.json`): 
+To generate a set of documentation: 
 
 ```
-./bin/raml-scoop --config=big generate
-``` 
+./bin/raml-scoop generate                                     (uses ./config/default.php)
+./bin/raml-scoop --config=big generate                        (uses ./config/big.php)
+./bin/raml-scoop --config=/full/path/to/config.php generate
+```
 
 To start a live preview server: from the same config:
 

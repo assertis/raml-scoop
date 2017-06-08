@@ -28,6 +28,7 @@ documentation:
       per_page:
         type: integer    
   post:
+    description: Create a new order
     headers:
       X-Auth-Token:
         displayName: Authentication header
@@ -35,7 +36,6 @@ documentation:
         type: string
         required: true
         pattern: ^[a-z0-9]{32}$
-    description: Create a new order
     body:
       application/json:
         example: !include CreateRequest.json

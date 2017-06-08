@@ -56,21 +56,21 @@
 
             {% for response in method.responses %}
 
-                {% if (response.headers) %}
-                    <ul class="method-headers">
-                        <h5>Response headers</h5>
-                        {% for parameter in response.headers %}
-                            {{ include('Parameter.twig') }}
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-
                 {% for body in response.bodies %}
 
                     <h5 class='method-response-header'>
                         <span class='method-response-code'>{{ response.statusCode }}</span>
                         <span class='method-response-type'>{{ body.mediaType }}</span>
                     </h5>
+
+                    {% if (response.headers) %}
+                        <ul class="method-headers">
+                            <h5>Response headers</h5>
+                            {% for parameter in response.headers %}
+                                {{ include('Parameter.twig') }}
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
 
                     {{ schema('Response schema', body.schema) }}
 
