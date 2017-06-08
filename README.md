@@ -5,8 +5,8 @@ Converts a set of RAML/JSON-Schema specifications into a single set of API docum
 ## Usage
 
 Create a configuration file based on `./config/config.sample.php` or `./config/config.sample.json`.
-There's a configuration for an example RAML specification provided with the application. 
-Use `example` as your config name. 
+There's a configuration for an example RAML specification provided with the application - 
+use `example` as your config name. 
 
 To generate a set of documentation: 
 

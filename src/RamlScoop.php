@@ -134,7 +134,7 @@ class RamlScoop extends Container
             return new PdfConverter(
                 $di[HtmlConverter::class],
                 new Pdf(),
-                new Filesystem(new Local(sys_get_temp_dir() . '/raml-scoop-pdf-converter-temp'))
+                new Filesystem(new Local($di['dir.resources'] . '/raml-scoop-pdf-converter-temp'))
             );
         };
 
