@@ -91,7 +91,7 @@ class Generate extends Command
                 'destination' => $project->getOutput()
             ]);
 
-            $manager->deleteAll('destination://');
+            $manager->deleteAll(sprintf('destination://%s', $format));
 
             $contents = $manager->listContents('source://', true);
             foreach ($contents as $fileNode) {
