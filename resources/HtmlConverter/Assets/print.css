@@ -1,0 +1,15 @@
+/**
+ * Print stylesheet for HTML Converter
+ * @author Michał Tatarynowicz <michal@assertis.co.uk>
+ */
+@media print {
+    
+    A {
+        color: inherit;
+        text-decoration: none;
+    }
+    
+    .hide-print {
+        display: none;
+    }
+}

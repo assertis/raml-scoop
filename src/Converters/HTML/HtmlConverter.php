@@ -86,6 +86,7 @@ class HtmlConverter implements Converter
 <html>
 <head>
 <link href='style.css' media='all' rel='stylesheet' />
+<link href='print.css' media='print' rel='stylesheet' />
 <link href='highlight.css' media='all' rel='stylesheet' />
 </head>
 <body>\n\n
@@ -97,11 +98,11 @@ var toggles = document.getElementsByClassName('snippet-toggle');
 var ii;
 for (ii = 0; ii < toggles.length; ii++) {
     toggles[ii].onclick = function(){
-        if (this.innerHTML == 'hide') {
-            this.innerHTML = 'show';
+        if (this.innerHTML == '(hide)') {
+            this.innerHTML = '(show)';
             this.parentNode.nextSibling.style.display = 'none';
         } else {
-            this.innerHTML = 'hide';
+            this.innerHTML = '(hide)';
             this.parentNode.nextSibling.style.display = 'block';
         }
     };
@@ -154,8 +155,8 @@ for (ii = 0; ii < toggles.length; ii++) {
     public function getExampleHtml(string $header, string $json): string
     {
         return
-            '<h5 class="example-header">' . $header . ' (<span class="snippet-toggle">show</span>)</h5>' .
-            '<div class="hide">' . $this->getJsonCodeSample($json) . "</div>";
+            '<h5 class="example-header">' . $header . ' <span class="snippet-toggle hide-print">(show)</span></h5>' .
+            '<div class="hide-screen">' . $this->getJsonCodeSample($json) . "</div>";
     }
 
     /**
@@ -170,8 +171,8 @@ for (ii = 0; ii < toggles.length; ii++) {
         $json = json_encode($stripped);
 
         return
-            '<h5 class="schema-header">' . $header . ' (<span class="snippet-toggle">show</span>)</h5>' .
-            '<div class="hide">' . $this->getJsonCodeSample($json) . "</div>";
+            '<h5 class="schema-header">' . $header . ' <span class="snippet-toggle hide-print">(show)</span></h5>' .
+            '<div class="hide-screen">' . $this->getJsonCodeSample($json) . "</div>";
     }
 
     /**

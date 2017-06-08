@@ -25,12 +25,13 @@ class PreviewHandler
 
     /**
      * @param string $uri
+     * @param string $format
      * @return int
      */
-    public function handle(string $uri): int
+    public function handle(string $uri, string $format): int
     {
         if ($uri === '/') {
-            $this->outputIndex();
+            $this->outputIndex($format);
             
             return 0;
         }
@@ -46,12 +47,14 @@ class PreviewHandler
         return 0;
     }
 
-    private function outputIndex()
+    private function outputIndex(string $format)
     {
         http_response_code(200);
 
+        print '<h1>Select file:</h1>';
+        
         foreach ($this->filesystem->listContents() as $item) {
-            print sprintf('<a href="%s">%s</a><br/>', $item['path'], $item['basename']);
+            print sprintf('<a href="%s?format=%s">%s</a><br/>', $item['path'], $format, $item['basename']);
         }
     }
 

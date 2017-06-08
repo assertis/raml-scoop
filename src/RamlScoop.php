@@ -9,6 +9,7 @@ use Assertis\RamlScoop\Configuration\ConfigurationResolver;
 use Assertis\RamlScoop\Converters\AggregateConverter;
 use Assertis\RamlScoop\Converters\HTML\HtmlConverter;
 use Assertis\RamlScoop\Converters\HTML\MichelfMarkdown;
+use Assertis\RamlScoop\Converters\PDF\PdfConverter;
 use Assertis\RamlScoop\Preview\PreviewGenerator;
 use Assertis\RamlScoop\Schema\ProjectReader;
 use Assertis\RamlScoop\Schema\SchemaReader;
@@ -16,6 +17,7 @@ use Assertis\RamlScoop\Tools\FlexibleFileLocator;
 use Jralph\Twig\Markdown\Extension;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
+use mikehaertl\wkhtmlto\Pdf;
 use Pimple\Container;
 use Symfony\Component\Console\Application;
 use Twig_Environment;
@@ -128,9 +130,18 @@ class RamlScoop extends Container
             return new HtmlConverter($resources, $twig);
         };
 
+        $this[PdfConverter::class] = function (Container $di) {
+            return new PdfConverter(
+                $di[HtmlConverter::class],
+                new Pdf(),
+                new Filesystem(new Local(sys_get_temp_dir() . '/raml-scoop-pdf-converter-temp'))
+            );
+        };
+
         $this[AggregateConverter::class] = function (Container $di) {
             return new AggregateConverter([
-                'html' => $di[HtmlConverter::class]
+                'html' => $di[HtmlConverter::class],
+                'pdf'  => $di[PdfConverter::class],
             ]);
         };
     }

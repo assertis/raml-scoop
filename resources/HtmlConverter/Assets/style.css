@@ -10,8 +10,10 @@ LI {
     padding: 0;
 }
 
-.hide {
-    display: none;
+@media screen {
+    .hide-screen {
+        display: none;
+    }
 }
 
 .snippet-toggle {

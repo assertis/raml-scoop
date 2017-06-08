@@ -31,7 +31,8 @@
     "league/flysystem-memory": "^1.0",
     "michelf/php-markdown": "^1.7",
     "twig/twig": "^2.4",
-    "jralph/twig-markdown": "^2.0"
+    "jralph/twig-markdown": "^2.0",
+    "mikehaertl/phpwkhtmltopdf": "^2.2"
   },
   "require-dev": {
     "pds/skeleton": "^1.0",

@@ -6,8 +6,8 @@ namespace Assertis\RamlScoop\Command;
 use Assertis\RamlScoop\Configuration\ConfigurationResolver;
 use Assertis\RamlScoop\Converters\AggregateConverter;
 use Assertis\RamlScoop\Schema\ProjectReader;
+use Assertis\RamlScoop\Tools\ImprovedMountManager;
 use League\Flysystem\Adapter\Local;
-use League\Flysystem\MountManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -60,8 +60,7 @@ class Generate extends Command
             'config',
             'c',
             InputOption::VALUE_REQUIRED,
-            'Name of or path to the config file (default: config/default.[php|json])',
-            'default'
+            'Name of or path to the config file (default: config/default.[php|json])'
         );
     }
 
@@ -87,32 +86,31 @@ class Generate extends Command
         foreach ($project->getFormats() as $format) {
             $filesystem = $this->converter->convert($format, $project);
 
-            $manager = new MountManager([
+            $manager = new ImprovedMountManager([
                 'source'      => $filesystem,
                 'destination' => $project->getOutput()
             ]);
 
+            $manager->deleteAll('destination://');
+
             $contents = $manager->listContents('source://', true);
             foreach ($contents as $fileNode) {
                 if ($fileNode['type'] == 'dir') {
-                    $manager->createDir('destination://html/' . $fileNode['path']);
+                    $manager->createDir(sprintf('destination://%s/%s', $format, $fileNode['path']));
                     continue;
                 }
 
                 $manager->put(
-                    'destination://html/' . $fileNode['path'],
-                    $manager->read('source://' . $fileNode['path'])
+                    sprintf('destination://%s/%s', $format, $fileNode['path']),
+                    $manager->read(sprintf('source://%s', $fileNode['path']))
                 );
             }
-
         }
-
-        $io->text('Flushing documentation to disk...');
 
         $adapter = $project->getOutput()->getAdapter();
 
         if ($adapter instanceof Local) {
-            $io->text('Flushed documentation to: ' . $adapter->getPathPrefix());
+            $io->text('Saved documentation to ' . $adapter->getPathPrefix());
         }
 
         $io->success('Done');

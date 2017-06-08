@@ -47,7 +47,7 @@ class FlexibleFileLocator implements FileLocatorInterface
     protected function getFullPath(string $name, ?string $currentPath): ?string
     {
         if ($name[0] === '/') {
-            return realpath($name) ?? null;
+            return realpath($name) ? realpath($name) : null;
         } else {
             return $this->fromPartialPath($name, $currentPath) ?? null;
         }

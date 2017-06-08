@@ -1,10 +1,16 @@
 {
+  "name": "Test project",
   "output": "/full/or-relative/path",
+  "formats": ["html", "pdf"],
   "sources": [
     {
       "name": "My Spec",
       "prefix": "/api/my",
-      "path": "../relative-to/raml-scoop-dir/specification.raml"
+      "path": "../relative-to/raml-scoop-dir/specification.raml",
+      "exclude": [
+        "/legacy-endpoint",
+        "/internal"
+      ]
     }
   ]
 }
