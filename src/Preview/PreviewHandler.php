@@ -47,6 +47,9 @@ class PreviewHandler
         return 0;
     }
 
+    /**
+     * @param string $format
+     */
     private function outputIndex(string $format)
     {
         http_response_code(200);

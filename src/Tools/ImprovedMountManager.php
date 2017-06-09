@@ -36,7 +36,7 @@ class ImprovedMountManager extends MountManager
         list($prefix, $directory) = $this->getPrefixAndPath($path);
         $filesystem = $this->getFilesystem($prefix);
 
-        foreach ($this->listContents($path, true) as $file) {
+        foreach ($this->listContents($path, $recursive) as $file) {
             if (!$filesystem->has($file['path'])) {
                 continue;
             }

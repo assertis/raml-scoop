@@ -7,6 +7,7 @@ use Assertis\RamlScoop\Configuration\ConfigurationResolver;
 use Assertis\RamlScoop\Converters\AggregateConverter;
 use Assertis\RamlScoop\Schema\ProjectReader;
 use Assertis\RamlScoop\Tools\ImprovedMountManager;
+use League\Flysystem\Adapter\Local;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -108,8 +109,11 @@ class Generate extends Command
                 );
             }
         }
+        
+        /** @var Local $adapter */
+        $adapter = $project->getOutput()->getAdapter();
 
-        $io->success('Saved documentation to ' . $project->getOutput()->getAdapter()->getPathPrefix());
+        $io->success('Saved documentation to ' . $adapter->getPathPrefix());
 
         return 0;
     }
