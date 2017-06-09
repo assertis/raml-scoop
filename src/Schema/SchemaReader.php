@@ -3,10 +3,7 @@ declare(strict_types=1);
 
 namespace Assertis\RamlScoop\Schema;
 
-use JsonSchema\RefResolver;
 use Raml\ApiDefinition;
-use Raml\FileLoader\DefaultFileLoader;
-use Raml\FileLoader\JsonSchemaFileLoader;
 use Raml\Parser;
 use Symfony\Component\Config\FileLocatorInterface;
 
@@ -19,13 +16,19 @@ class SchemaReader
      * @var FileLocatorInterface
      */
     private $locator;
+    /**
+     * @var Parser
+     */
+    private $parser;
 
     /**
      * @param FileLocatorInterface $locator
+     * @param Parser $parser
      */
-    public function __construct(FileLocatorInterface $locator)
+    public function __construct(FileLocatorInterface $locator, Parser $parser)
     {
         $this->locator = $locator;
+        $this->parser = $parser;
     }
 
     /**
@@ -36,15 +39,6 @@ class SchemaReader
     {
         $path = $this->locator->locate($path);
 
-        RefResolver::$maxDepth = 200;
-
-        $parser = new Parser(null, null, [
-            new JsonSchemaFileLoader(['jschema']),
-            new DefaultFileLoader(),
-        ]);
-
-        $parser->configuration->enableDirectoryTraversal();
-
-        return $parser->parse($path);
+        return $this->parser->parse($path);
     }
 }

@@ -7,7 +7,6 @@ use Assertis\RamlScoop\Configuration\ConfigurationResolver;
 use Assertis\RamlScoop\Converters\AggregateConverter;
 use Assertis\RamlScoop\Schema\ProjectReader;
 use Assertis\RamlScoop\Tools\ImprovedMountManager;
-use League\Flysystem\Adapter\Local;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -79,9 +78,12 @@ class Generate extends Command
         $io->note('Using config: ' . $configPath);
 
         $config = $this->configurationResolver->resolve($configName);
+
+        $io->text('Reading project and parsing RAML specifications...');
+
         $project = $this->projectReader->read($config);
 
-        $io->text(sprintf('Generating documentation for project "%s"...', $project->getName()));
+        $io->text('Generating documentation...');
 
         foreach ($project->getFormats() as $format) {
             $filesystem = $this->converter->convert($format, $project);
@@ -107,13 +109,7 @@ class Generate extends Command
             }
         }
 
-        $adapter = $project->getOutput()->getAdapter();
-
-        if ($adapter instanceof Local) {
-            $io->text('Saved documentation to ' . $adapter->getPathPrefix());
-        }
-
-        $io->success('Done');
+        $io->success('Saved documentation to ' . $project->getOutput()->getAdapter()->getPathPrefix());
 
         return 0;
     }

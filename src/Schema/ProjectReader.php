@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Assertis\RamlScoop\Schema;
 
+use InvalidArgumentException;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 
@@ -15,13 +16,19 @@ class ProjectReader
      * @var SchemaReader
      */
     private $schemaReader;
+    /**
+     * @var string
+     */
+    private $tempPath;
 
     /**
      * @param SchemaReader $schemaReader
+     * @param string $tempPath
      */
-    public function __construct(SchemaReader $schemaReader)
+    public function __construct(SchemaReader $schemaReader, string $tempPath)
     {
         $this->schemaReader = $schemaReader;
+        $this->tempPath = $tempPath;
     }
 
     /**
@@ -34,11 +41,62 @@ class ProjectReader
 
         $sources = [];
         foreach ($config['sources'] as $source) {
-            $definition = $this->schemaReader->read($source['path']);
+            if (isset($source['path'])) {
+                $path = $source['path'];
+            } elseif (isset($source['git'])) {
+                $path = $this->fromGithub(
+                    $source['git']['uri'],
+                    $source['git']['branch'],
+                    $source['git']['path']
+                );
+            } else {
+                throw new InvalidArgumentException(
+                    'Source has to have either a path or git information.'
+                );
+            }
+
+            $definition = $this->schemaReader->read($path);
+
             $sources[] = new Source($source['name'], $source['prefix'], $definition, $source['exclude']);
         }
-        
+
         return new Project($config['name'], $config['formats'], $output, $sources);
+    }
+
+    /**
+     * @param string $repo
+     * @param string $branch
+     * @param string $path
+     * @return string
+     */
+    private function fromGithub(string $repo, string $branch, string $path): string
+    {
+        if (!preg_match('/^[^:]+\:(.+)$/', $repo, $matches)) {
+            throw new InvalidArgumentException(sprintf(
+                'Not a valid repository address: %s',
+                $repo
+            ));
+        }
+
+        $dirName = str_replace('/', '-', $matches[1]);
+        $tempPath = $this->tempPath . '/' . $dirName;
+
+        if (is_dir($tempPath)) {
+            exec(sprintf('cd %s; git fetch --all; git reset --hard origin/%s', $tempPath, $branch));
+        } else {
+            exec(sprintf('git clone %s %s -b %s', $repo, $tempPath, $branch));
+        }
+
+        $ramlPath = realpath($tempPath . '/' . $path);
+        
+        if (empty($ramlPath)) {
+            throw new InvalidArgumentException(sprintf(
+                'Path %s does not exist',
+                $tempPath . '/' . $path
+            ));
+        }
+
+        return $ramlPath;
     }
 
     /**

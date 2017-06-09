@@ -15,10 +15,14 @@ use Assertis\RamlScoop\Schema\ProjectReader;
 use Assertis\RamlScoop\Schema\SchemaReader;
 use Assertis\RamlScoop\Tools\FlexibleFileLocator;
 use Jralph\Twig\Markdown\Extension;
+use JsonSchema\RefResolver;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 use mikehaertl\wkhtmlto\Pdf;
 use Pimple\Container;
+use Raml\FileLoader\DefaultFileLoader;
+use Raml\FileLoader\JsonSchemaFileLoader;
+use Raml\Parser;
 use Symfony\Component\Console\Application;
 use Twig_Environment;
 use Twig_Loader_Filesystem;
@@ -61,6 +65,7 @@ class RamlScoop extends Container
         $this['dir.root'] = $rootDir;
         $this['dir.config'] = $this['dir.root'] . '/config';
         $this['dir.resources'] = $this['dir.root'] . '/resources';
+        $this['dir.tmp'] = $this['dir.root'] . '/tmp';
 
         $this['app.commands'] = [
             Generate::class,
@@ -81,14 +86,29 @@ class RamlScoop extends Container
             return new ConfigurationResolver($di['dir.config'], $di['dir.current']);
         };
 
+        $this[Parser::class] = function () {
+            RefResolver::$maxDepth = 200;
+
+            $parser = new Parser(null, null, [
+                new JsonSchemaFileLoader(['jschema']),
+                new DefaultFileLoader(),
+            ]);
+
+            $parser->configuration->enableDirectoryTraversal();
+
+            return $parser;
+        };
+
         $this[SchemaReader::class] = function (Container $di) {
             $locator = new FlexibleFileLocator([$di['dir.current']]);
 
-            return new SchemaReader($locator);
+            return new SchemaReader($locator, $di[Parser::class]);
         };
 
         $this[ProjectReader::class] = function (Container $di) {
-            return new ProjectReader($di[SchemaReader::class]);
+            $tempPath = $di['dir.tmp'] . '/project-reader';
+
+            return new ProjectReader($di[SchemaReader::class], $tempPath);
         };
 
         $this[PreviewGenerator::class] = function (Container $di) {
@@ -134,7 +154,7 @@ class RamlScoop extends Container
             return new PdfConverter(
                 $di[HtmlConverter::class],
                 new Pdf(),
-                new Filesystem(new Local($di['dir.resources'] . '/raml-scoop-pdf-converter-temp'))
+                new Filesystem(new Local($di['dir.tmp'] . '/pdf-converter'))
             );
         };
 
