@@ -14,77 +14,7 @@
 {% endif %}
 
 {% for method in resource.methods %}
-
-    <h4 class="method-header">
-        <span class='method-type'>{{ method.type }}</span>
-        <span class='method-uri-prefix'>{{ source.prefix }}</span><span class='method-uri'>{{ resource.uri }}</span>
-    </h4>
-
-    {% if (method.description) %}
-        {{ method.description | markdown }}
-    {% endif %}
-
-    {% if (method.queryParameters) %}
-        <ul class="method-parameters">
-            <h5>Parameters</h5>
-            {% for parameter in method.queryParameters %}
-                {{ include('Parameter.twig') }}
-            {% endfor %}
-        </ul>
-    {% endif %}
-
-    {% if (method.headers) %}
-        <ul class="method-headers">
-            <h5>Headers</h5>
-            {% for parameter in method.headers %}
-                {{ include('Parameter.twig') }}
-            {% endfor %}
-        </ul>
-    {% endif %}
-
-    {% for body in method.bodies %}
-        {{ schema('Request schema', body.schema) }}
-
-        {% for example in body.examples %}
-            {{ example('Request example', example) }}
-        {% endfor %}
-    {% endfor %}
-
-    {% if method.responses %}
-
-        <div class="method-responses">
-
-            {% for response in method.responses %}
-
-                {% for body in response.bodies %}
-
-                    <h5 class='method-response-header'>
-                        <span class='method-response-code'>{{ response.statusCode }}</span>
-                        <span class='method-response-type'>{{ body.mediaType }}</span>
-                    </h5>
-
-                    {% if (response.headers) %}
-                        <ul class="method-headers">
-                            <h5>Response headers</h5>
-                            {% for parameter in response.headers %}
-                                {{ include('Parameter.twig') }}
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
-
-                    {{ schema('Response schema', body.schema) }}
-
-                    {% for example in body.examples %}
-                        {{ example('Response example', example) }}
-                    {% endfor %}
-                {% endfor %}
-
-            {% endfor %}
-
-        </div>
-
-    {% endif %}
-
+    {{ include('Method.twig') }}
 {% endfor %}
 
 {% for resource in resource.resources %}

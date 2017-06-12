@@ -1,0 +1,11 @@
+<h2 class="source-header">{{ source.name }}</h2>
+
+{% if source.definition.documentationList %}
+    {{ include('Documentation.twig') }}
+{% endif %}
+
+{% for resource in source.definition.resources %}
+    {% if resource.uri not in source.excluded %}
+        {{ include('Resource.twig') }}
+    {% endif %}
+{% endfor %}

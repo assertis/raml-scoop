@@ -1,0 +1,36 @@
+<html>
+<head>
+    <title>{{ project.name }}</title>
+    <meta name="generator" content="RAML Scoop" />
+    <link href="style.css" media="all" rel="stylesheet"/>
+    <link href="print.css" media="print" rel="stylesheet"/>
+    <link href="highlight.css" media="all" rel="stylesheet"/>
+</head>
+<body>
+
+<h1>{{ project.name }}</h1>
+
+{% for source in project.sources %}
+    {{ include('Source.twig') }}
+{% endfor %}
+
+<script src="highlight.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+<script>
+    var toggles = document.getElementsByClassName('snippet-toggle');
+    var ii;
+    for (ii = 0; ii < toggles.length; ii++) {
+        toggles[ii].onclick = function () {
+            if (this.innerHTML === '(hide)') {
+                this.innerHTML = '(show)';
+                this.parentNode.nextSibling.style.display = 'none';
+            } else {
+                this.innerHTML = '(hide)';
+                this.parentNode.nextSibling.style.display = 'block';
+            }
+        };
+    }
+</script>
+
+</body>
+</html>
