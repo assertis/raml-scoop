@@ -51,7 +51,6 @@ class HtmlConverter implements Converter
 
         /** @var Source $source */
         foreach ($project->getSources() as $source) {
-            
             $out .= "<h2 class='source-header'>{$source->getName()}</h2>\n";
 
             if ($source->getDefinition()->getDocumentationList()) {
@@ -63,12 +62,9 @@ class HtmlConverter implements Converter
 
             /** @var \Raml\Resource $resource */
             foreach ($source->getDefinition()->getResources() as $resource) {
-
                 if (in_array($resource->getUri(), $source->getExcluded())) {
                     continue;
                 }
-                
-                //$resource->getBaseUriParameters()
 
                 $out .= $this->twig->render(
                     'Resource.twig',

@@ -10,6 +10,7 @@ use Assertis\RamlScoop\Converters\AggregateConverter;
 use Assertis\RamlScoop\Converters\HTML\HtmlConverter;
 use Assertis\RamlScoop\Converters\HTML\MichelfMarkdown;
 use Assertis\RamlScoop\Converters\PDF\PdfConverter;
+use Assertis\RamlScoop\Converters\ZIP\ZipConverter;
 use Assertis\RamlScoop\Preview\PreviewGenerator;
 use Assertis\RamlScoop\Schema\ProjectReader;
 use Assertis\RamlScoop\Schema\SchemaReader;
@@ -23,6 +24,7 @@ use Pimple\Container;
 use Raml\FileLoader\DefaultFileLoader;
 use Raml\FileLoader\JsonSchemaFileLoader;
 use Raml\Parser;
+use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Console\Application;
 use Twig_Environment;
 use Twig_Loader_Filesystem;
@@ -99,16 +101,22 @@ class RamlScoop extends Container
             return $parser;
         };
 
-        $this[SchemaReader::class] = function (Container $di) {
-            $locator = new FlexibleFileLocator([$di['dir.current']]);
+        $this[FileLocatorInterface::class] = function (Container $di) {
+            return new FlexibleFileLocator([$di['dir.current']]);
+        };
 
-            return new SchemaReader($locator, $di[Parser::class]);
+        $this[SchemaReader::class] = function (Container $di) {
+            return new SchemaReader($di[FileLocatorInterface::class], $di[Parser::class]);
         };
 
         $this[ProjectReader::class] = function (Container $di) {
             $tempPath = $di['dir.tmp'] . '/project-reader';
 
-            return new ProjectReader($di[SchemaReader::class], $tempPath);
+            return new ProjectReader(
+                $di[SchemaReader::class],
+                $di[FileLocatorInterface::class],
+                $tempPath
+            );
         };
 
         $this[PreviewGenerator::class] = function (Container $di) {
@@ -151,17 +159,22 @@ class RamlScoop extends Container
         };
 
         $this[PdfConverter::class] = function (Container $di) {
-            return new PdfConverter(
-                $di[HtmlConverter::class],
-                new Pdf(),
-                new Filesystem(new Local($di['dir.tmp'] . '/pdf-converter'))
-            );
+            $temp = new Filesystem(new Local($di['dir.tmp'] . '/pdf-converter'));
+
+            return new PdfConverter($di[HtmlConverter::class], new Pdf(), $temp);
+        };
+
+        $this[ZipConverter::class] = function (Container $di) {
+            $temp = new Filesystem(new Local($di['dir.tmp'] . '/zip-converter'));
+                
+            return new ZipConverter($temp);
         };
 
         $this[AggregateConverter::class] = function (Container $di) {
             return new AggregateConverter([
                 'html' => $di[HtmlConverter::class],
                 'pdf'  => $di[PdfConverter::class],
+                'zip'  => $di[ZipConverter::class]
             ]);
         };
     }

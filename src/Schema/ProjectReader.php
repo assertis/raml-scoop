@@ -6,6 +6,7 @@ namespace Assertis\RamlScoop\Schema;
 use InvalidArgumentException;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
+use Symfony\Component\Config\FileLocatorInterface;
 
 /**
  * @author Michał Tatarynowicz <michal.tatarynowicz@assertis.co.uk>
@@ -17,17 +18,23 @@ class ProjectReader
      */
     private $schemaReader;
     /**
+     * @var FileLocatorInterface
+     */
+    private $locator;
+    /**
      * @var string
      */
     private $tempPath;
 
     /**
      * @param SchemaReader $schemaReader
+     * @param FileLocatorInterface $locator
      * @param string $tempPath
      */
-    public function __construct(SchemaReader $schemaReader, string $tempPath)
+    public function __construct(SchemaReader $schemaReader, FileLocatorInterface $locator, string $tempPath)
     {
         $this->schemaReader = $schemaReader;
+        $this->locator = $locator;
         $this->tempPath = $tempPath;
     }
 
@@ -57,7 +64,13 @@ class ProjectReader
 
             $definition = $this->schemaReader->read($path);
 
-            $sources[] = new Source($source['name'], $source['prefix'], $definition, $source['exclude']);
+            $sources[] = new Source(
+                $source['name'],
+                $source['prefix'],
+                dirname($this->locator->locate($path)),
+                $definition,
+                $source['exclude']
+            );
         }
 
         return new Project($config['name'], $config['formats'], $output, $sources);
@@ -88,7 +101,7 @@ class ProjectReader
         }
 
         $ramlPath = realpath($tempPath . '/' . $path);
-        
+
         if (empty($ramlPath)) {
             throw new InvalidArgumentException(sprintf(
                 'Path %s does not exist',

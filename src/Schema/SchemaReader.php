@@ -30,7 +30,7 @@ class SchemaReader
         $this->locator = $locator;
         $this->parser = $parser;
     }
-
+    
     /**
      * @param string $path
      * @return ApiDefinition

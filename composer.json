@@ -32,7 +32,8 @@
     "michelf/php-markdown": "^1.7",
     "twig/twig": "^2.4",
     "jralph/twig-markdown": "^2.0",
-    "mikehaertl/phpwkhtmltopdf": "^2.2"
+    "mikehaertl/phpwkhtmltopdf": "^2.2",
+    "league/flysystem-ziparchive": "^1.0"
   },
   "require-dev": {
     "pds/skeleton": "^1.0",
