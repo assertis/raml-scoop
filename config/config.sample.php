@@ -11,8 +11,8 @@ return [
     'output'  => '/full/or-relative/path',
 
     // List of documentation formats to generate.
-    // Default: ['pdf', 'html']
-    'formats' => ['pdf', 'html'],
+    // Default: ['pdf', 'html', 'zip']
+    'formats' => ['pdf', 'html', 'zip'],
 
     // Needs at least one resource.
     'sources' => [

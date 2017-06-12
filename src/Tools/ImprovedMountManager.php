@@ -17,12 +17,18 @@ class ImprovedMountManager extends MountManager
      */
     public function copyDirectory(string $source, string $destination): bool
     {
+        if ($source[-1] !== '/') {
+            $source .= '/';
+        }
+
         if ($destination[-1] !== '/') {
             $destination .= '/';
         }
 
-        foreach ($this->listContents($source, true) as $file) {
-            if (!$this->copy($source . $file['path'], $destination . $file['path'])) {
+        foreach ($this->listContents($source, false) as $file) {
+            if ($file['type'] === 'dir') {
+                $this->copyDirectory($source . $file['path'], $destination . $file['path']);
+            } elseif (!$this->copy($source . $file['basename'], $destination . $file['basename'])) {
                 return false;
             }
         }

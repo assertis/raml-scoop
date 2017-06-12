@@ -64,7 +64,11 @@ class ZipConverter implements Converter
 
         $adapter->getArchive()->close();
         
-        return file_get_contents($path);
+        $out = file_get_contents($path);
+        
+        unlink($path);
+        
+        return $out;
     }
 
     /**

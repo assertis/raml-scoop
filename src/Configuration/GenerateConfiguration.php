@@ -26,7 +26,7 @@ class GenerateConfiguration implements ConfigurationInterface
             ->end()
             ->arrayNode('formats')
                 ->prototype('scalar')->end()
-                ->defaultValue(['html','pdf'])
+                ->defaultValue(['html', 'pdf', 'zip'])
             ->end()
             ->arrayNode('sources')
                 ->prototype('array')
