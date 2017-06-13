@@ -26,7 +26,9 @@
 {% endif %}
 
 {% for body in method.bodies %}
-    {{ schema('Request schema', body.schema) }}
+    {% if body.schema %}
+        {{ schema('Request schema', body.schema) }}
+    {% endif %}
 
     {% for example in body.examples %}
         {{ example('Request example', example) }}

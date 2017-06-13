@@ -14,7 +14,9 @@
         </ul>
     {% endif %}
 
-    {{ schema('Response schema', body.schema) }}
+    {% if body.schema %}
+        {{ schema('Response schema', body.schema) }}
+    {% endif %}
 
     {% for example in body.examples %}
         {{ example('Response example', example) }}
