@@ -29,3 +29,9 @@ For comprehensive information about available options run:
 ```
 ./bin/raml-scoop
 ``` 
+
+## Themes
+
+To create a new theme take a look at the existing one in `/resources/DefaultTheme`. 
+Everything in the `Assets` subdirectory gets copied over as is, and `Views` subdirectory 
+needs to have a `Project.twig` file in it. It gets passed an `Project` object as `project` variable.
