@@ -3,7 +3,8 @@ declare(strict_types=1);
 
 namespace Assertis\RamlScoop\Schema;
 
-use League\Flysystem\Filesystem;
+use Assertis\RamlScoop\Themes\Theme;
+use League\Flysystem\FilesystemInterface;
 
 /**
  * @author Michał Tatarynowicz <michal.tatarynowicz@assertis.co.uk>
@@ -16,21 +17,24 @@ class Project
      * @var string
      */
     private $name;
-
+    /**
+     * Theme to render the project with.
+     *
+     * @var Theme
+     */
+    private $theme;
     /**
      * A list of output formats to generate.
      *
      * @var array
      */
     private $formats;
-
     /**
      * Output directory.
      *
-     * @var Filesystem
+     * @var FilesystemInterface
      */
     private $output;
-
     /**
      * A list of API definition sources.
      *
@@ -40,13 +44,20 @@ class Project
 
     /**
      * @param string $name
+     * @param Theme $theme
      * @param array $formats
-     * @param Filesystem $output
+     * @param FilesystemInterface $output
      * @param Source[] $sources
      */
-    public function __construct(string $name, array $formats, Filesystem $output, array $sources)
-    {
+    public function __construct(
+        string $name,
+        Theme $theme,
+        array $formats,
+        FilesystemInterface $output,
+        array $sources
+    ) {
         $this->name = $name;
+        $this->theme = $theme;
         $this->formats = $formats;
         $this->output = $output;
         $this->sources = $sources;
@@ -61,6 +72,14 @@ class Project
     }
 
     /**
+     * @return Theme
+     */
+    public function getTheme(): Theme
+    {
+        return $this->theme;
+    }
+
+    /**
      * @return array
      */
     public function getFormats(): array
@@ -69,9 +88,9 @@ class Project
     }
 
     /**
-     * @return Filesystem
+     * @return FilesystemInterface
      */
-    public function getOutput(): Filesystem
+    public function getOutput(): FilesystemInterface
     {
         return $this->output;
     }

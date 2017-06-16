@@ -7,12 +7,16 @@ return [
     'name'    => 'Test Project',
 
     // Where to put the generated documentation.
-    // Default: 'resources/output'
+    // Default: 'tmp/Documentation'
     'output'  => '/full/or-relative/path',
 
     // List of documentation formats to generate.
     // Default: ['pdf', 'html', 'zip']
     'formats' => ['pdf', 'html', 'zip'],
+    
+    // Theme with which to render the project
+    // Default: 'resources/DefaultTheme'
+    'theme' => '/full/or-relative/path',
 
     // Needs at least one resource.
     'sources' => [

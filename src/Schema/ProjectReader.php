@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Assertis\RamlScoop\Schema;
 
+use Assertis\RamlScoop\Themes\ThemeLoader;
 use InvalidArgumentException;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
@@ -18,6 +19,10 @@ class ProjectReader
      */
     private $schemaReader;
     /**
+     * @var ThemeLoader
+     */
+    private $themeLoader;
+    /**
      * @var FileLocatorInterface
      */
     private $locator;
@@ -28,12 +33,18 @@ class ProjectReader
 
     /**
      * @param SchemaReader $schemaReader
+     * @param ThemeLoader $themeLoader
      * @param FileLocatorInterface $locator
      * @param string $tempPath
      */
-    public function __construct(SchemaReader $schemaReader, FileLocatorInterface $locator, string $tempPath)
-    {
+    public function __construct(
+        SchemaReader $schemaReader,
+        ThemeLoader $themeLoader,
+        FileLocatorInterface $locator,
+        string $tempPath
+    ) {
         $this->schemaReader = $schemaReader;
+        $this->themeLoader = $themeLoader;
         $this->locator = $locator;
         $this->tempPath = $tempPath;
     }
@@ -45,6 +56,7 @@ class ProjectReader
     public function read(array $config): Project
     {
         $output = $this->getOutput($config['output']);
+        $theme = $this->themeLoader->getTheme($config['theme']);
 
         $sources = [];
         foreach ($config['sources'] as $source) {
@@ -73,7 +85,7 @@ class ProjectReader
             );
         }
 
-        return new Project($config['name'], $config['formats'], $output, $sources);
+        return new Project($config['name'], $theme, $config['formats'], $output, $sources);
     }
 
     /**
@@ -118,7 +130,7 @@ class ProjectReader
      */
     private function getOutput(string $path): Filesystem
     {
-        $realPath = realpath($path[0] === '/' ? $path : getcwd() . '/' . $path);
+        $realPath = $path[0] === '/' ? $path : getcwd() . '/' . $path;
 
         return new Filesystem(new Local($realPath));
     }

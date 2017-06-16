@@ -8,7 +8,7 @@ use Assertis\RamlScoop\Schema\Project;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Memory\MemoryAdapter;
 use League\Flysystem\MountManager;
-use Twig_Environment as Twig;
+use Twig_Environment;
 use Twig_Function;
 
 /**
@@ -16,27 +16,33 @@ use Twig_Function;
  */
 class HtmlConverter implements Converter
 {
-    /**
-     * @var Filesystem
-     */
-    private $resources;
-    /**
-     * @var Twig
-     */
-    private $twig;
+    private $initialized = false;
 
     /**
-     * @param Filesystem $resources
-     * @param Twig $twig
+     * @param Project $project
+     * @return Twig_Environment
      */
-    public function __construct(Filesystem $resources, Twig $twig)
+    private function getTwig(Project $project): Twig_Environment
     {
-        $this->resources = $resources;
-        $this->twig = $twig;
+        $twig = $project->getTheme()->getTwig();
+        
+        if (!$this->initialized) {
+            $twig->addFunction(
+                new Twig_Function('schema', [$this, 'getSchemaHtml'], ['is_safe' => ['html']])
+            );
 
-        $this->twig->addFunction(new Twig_Function('schema', [$this, 'getSchemaHtml'], ['is_safe' => ['html']]));
-        $this->twig->addFunction(new Twig_Function('example', [$this, 'getExampleHtml'], ['is_safe' => ['html']]));
-        $this->twig->addFunction(new Twig_Function('dump', 'dump', ['is_safe' => ['html']]));
+            $twig->addFunction(
+                new Twig_Function('example', [$this, 'getExampleHtml'], ['is_safe' => ['html']])
+            );
+
+            $twig->addFunction(
+                new Twig_Function('dump', 'dump', ['is_safe' => ['html']])
+            );
+
+            $this->initialized = true;
+        }
+
+        return $twig;
     }
 
     /**
@@ -44,13 +50,13 @@ class HtmlConverter implements Converter
      */
     public function convert(Project $project): Filesystem
     {
-        $html = $this->twig->render('Project.twig', ['project' => $project]);
+        $html = $this->getTwig($project)->render('Project.twig', ['project' => $project]);
 
         $filesystem = new Filesystem(new MemoryAdapter());
         $filesystem->put('/index.html', $html);
 
         $manager = new MountManager([
-            'res' => $this->resources,
+            'res' => $project->getTheme()->getResources(),
             'out' => $filesystem
         ]);
 
