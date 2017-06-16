@@ -1,5 +1,6 @@
 {
   "name": "Test project",
+  "theme": "/full/or-relative/path",
   "output": "/full/or-relative/path",
   "formats": ["html", "pdf"],
   "sources": [

@@ -6,6 +6,10 @@ return [
     // Can also be used as a basis for a filename (i.e. ProjectAPIv1.pdf)
     'name'    => 'Test Project',
 
+    // Theme with which to render the project
+    // Default: 'resources/DefaultTheme'
+    'theme' => '/full/or-relative/path',
+
     // Where to put the generated documentation.
     // Default: 'tmp/Documentation'
     'output'  => '/full/or-relative/path',
@@ -13,10 +17,6 @@ return [
     // List of documentation formats to generate.
     // Default: ['pdf', 'html', 'zip']
     'formats' => ['pdf', 'html', 'zip'],
-    
-    // Theme with which to render the project
-    // Default: 'resources/DefaultTheme'
-    'theme' => '/full/or-relative/path',
 
     // Needs at least one resource.
     'sources' => [
