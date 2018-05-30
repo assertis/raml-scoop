@@ -82,7 +82,7 @@ class HtmlConverter implements Converter
      */
     private function getJsonCodeSample(string $json): string
     {
-        $json = json_encode(json_decode($json, true), JSON_PRETTY_PRINT);
+        $json = json_encode(json_decode($json, true), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
         return "<pre><code class='language-json hljs json'>{$json}</code></pre>\n";
     }
