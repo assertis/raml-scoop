@@ -15,7 +15,6 @@ use Assertis\RamlScoop\Schema\ProjectReader;
 use Assertis\RamlScoop\Schema\SchemaReader;
 use Assertis\RamlScoop\Themes\ThemeLoader;
 use Assertis\RamlScoop\Tools\FlexibleFileLocator;
-use JsonSchema\RefResolver;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 use mikehaertl\wkhtmlto\Pdf;
@@ -86,8 +85,6 @@ class RamlScoop extends Container
         };
 
         $this[Parser::class] = function () {
-            RefResolver::$maxDepth = 200;
-
             $parser = new Parser(null, null, [
                 new JsonSchemaFileLoader(['jschema']),
                 new DefaultFileLoader(),
