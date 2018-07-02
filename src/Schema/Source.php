@@ -30,6 +30,10 @@ class Source
      * @var array
      */
     private $excluded;
+    /**
+     * @var array
+     */
+    private $prefixes;
 
     /**
      * @param string $name
@@ -37,19 +41,22 @@ class Source
      * @param string $directory
      * @param ApiDefinition $definition
      * @param array $excluded List of excluded URI
+     * @param array $prefixes List of prefixes for specific urls
      */
     public function __construct(
         string $name,
         string $prefix,
         string $directory,
         ApiDefinition $definition,
-        array $excluded
+        array $excluded,
+        array $prefixes
     ) {
         $this->name = $name;
         $this->prefix = $prefix;
         $this->directory = $directory;
         $this->definition = $definition;
         $this->excluded = $excluded;
+        $this->prefixes = $prefixes;
     }
 
     /**
@@ -90,5 +97,13 @@ class Source
     public function getExcluded(): array
     {
         return $this->excluded;
+    }
+
+    /**
+     * @return array
+     */
+    public function getPrefixes(): array
+    {
+        return $this->prefixes;
     }
 }

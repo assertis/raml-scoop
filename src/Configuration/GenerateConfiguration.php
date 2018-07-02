@@ -50,6 +50,10 @@ class GenerateConfiguration implements ConfigurationInterface
                             ->prototype('scalar')->end()
                             ->defaultValue([])
                         ->end()
+                        ->arrayNode('prefixes')
+                        ->prototype('scalar')->end()
+                        ->defaultValue([])
+                        ->end()
                     ->end()
                 ->end()
             ->end();
