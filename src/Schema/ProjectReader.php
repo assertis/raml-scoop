@@ -81,7 +81,8 @@ class ProjectReader
                 $source['prefix'],
                 dirname($this->locator->locate($path)),
                 $definition,
-                $source['exclude']
+                $source['exclude'],
+                $source['prefixes']
             );
         }
 

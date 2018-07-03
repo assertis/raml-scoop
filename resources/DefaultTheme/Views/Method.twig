@@ -1,6 +1,7 @@
+{% set url = resource.uri %}
 <h4 class="method-header">
     <span class='method-type'>{{ method.type }}</span>
-    <span class='method-uri-prefix'>{{ source.prefix }}</span><span class='method-uri'>{{ resource.uri }}</span>
+    <span class='method-uri-prefix'>{{ source.prefix }}</span><span class='method-uri'>{{ source.prefixes[url] }}{{ resource.uri }}</span>
 </h4>
 
 {% if (method.description) %}

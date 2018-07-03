@@ -36,6 +36,10 @@ return [
             'exclude' => [
                 '/legacy-endpoint',
                 '/internal'
+            ],
+            // Prefixes for specific endpoints
+            'prefixes' => [
+                'endpoint-uri' => 'prefix-for-this-enpoint'
             ]
         ],
         [
@@ -53,6 +57,10 @@ return [
                 // Path inside of the repository to take specification from.
                 'path'   => '/specs/api.raml',
             ],
+
+            'prefixes' => [
+                'endpoint-uri' => 'prefix-for-this-enpoint'
+            ]
         ],
     ]
 ];
