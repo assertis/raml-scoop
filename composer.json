@@ -46,6 +46,6 @@
     "pds/skeleton": "^1.0",
     "roave/security-advisories": "dev-master",
     "symfony/var-dumper": "^3.3",
-    "phpunit/phpunit": "^6.1"
+    "phpunit/phpunit": "^8.2"
   }
 }
